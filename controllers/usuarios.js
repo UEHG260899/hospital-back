@@ -12,7 +12,8 @@ const getUsuarios = async(req = request, resp = response) => {
     
     return resp.status(200).json({
         ok : true,
-        usuarios
+        usuarios,
+        uid : req.uid
     });
 }
 
