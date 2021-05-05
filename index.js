@@ -13,13 +13,10 @@ dbConnection();
 
 
 app.use( cors() );
+app.use( express.json() );
+
 //Rutas
-app.get('/', (req, resp) => {
-    resp.status(200).json({
-        ok : true,
-        msg : 'Hola Mundo'
-    });
-});
+app.use( '/api/usuarios', require('./routes/usuarios') )
 
 app.listen(process.env.PORT, () => {
     console.log(`Servidor arriba en el puerto ${process.env.PORT}`);
