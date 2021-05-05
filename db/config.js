@@ -5,7 +5,8 @@ const dbConnection = async() => {
         await mongoose.connect(process.env.BD_CON, {
             useNewUrlParser : true,
             useUnifiedTopology : true,
-            useCreateIndex : true
+            useCreateIndex : true,
+            useFindAndModify: false
         });
 
         console.log('Base de datos arriba');
