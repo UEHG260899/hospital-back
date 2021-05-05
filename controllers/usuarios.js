@@ -1,6 +1,9 @@
 const { request, response } = require('express');
 const bcryptjs = require('bcryptjs');
+
+
 const Usuario = require('../models/Usuario');
+const { generarJWT } = require('../helpers/jwt');
 
 
 const getUsuarios = async(req = request, resp = response) => {
@@ -32,10 +35,12 @@ const crearUsuarios = async (req = request, resp = response) => {
         usuario.password = bcryptjs.hashSync(password, salt);
 
         await usuario.save();
+        const token = await generarJWT(usuario.id);
         
         return resp.status(200).json({
             ok : true,
-            usuario
+            usuario,
+            token
         });
     }catch(err){
         console.log(err);
@@ -90,9 +95,35 @@ const actualizaUsuario = async (req = request, resp = response) => {
     }
 }
 
+const borrarUsuario = async (req = request, resp = response) => {
+    const uid = req.params.id;
+    try{
+        const dbUser = await Usuario.findById(uid);
+        if(!dbUser){
+            return resp.status(404).json({
+                ok : false,
+                msg : 'No existe un usuario con ese id'
+            });
+        }
+
+        await Usuario.findByIdAndDelete(uid);
+        return resp.status(200).json({
+            ok  : true,
+            msg : 'Usuario eliminado'
+        });
+    }catch(err){
+        console.log(err);
+        return resp.status(500).json({
+            ok : true,
+            msg : 'Ocurrio un error al momento de eliminar al usuario'
+        });
+    }
+}
+
 
 module.exports = {
     getUsuarios,
     crearUsuarios,
-    actualizaUsuario
+    actualizaUsuario,
+    borrarUsuario
 }
