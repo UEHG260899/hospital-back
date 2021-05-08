@@ -18,6 +18,7 @@ app.use( express.json() );
 //Rutas
 app.use( '/api/usuarios', require('./routes/usuarios') );
 app.use( '/api/login', require('./routes/auth') );
+app.use( '/api/hospital', require('./routes/hospitales') );
 
 app.listen(process.env.PORT, () => {
     console.log(`Servidor arriba en el puerto ${process.env.PORT}`);
