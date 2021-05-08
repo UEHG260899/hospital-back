@@ -6,48 +6,58 @@ const Usuario = require('../models/Usuario');
 const { generarJWT } = require('../helpers/jwt');
 
 
-const getUsuarios = async(req = request, resp = response) => {
-    
-    const usuarios = await Usuario.find({}, 'nombre email role google');
-    
-    return resp.status(200).json({
-        ok : true,
-        usuarios,
-        uid : req.uid
-    });
+const getUsuarios = async (req = request, resp = response) => {
+
+    //Extrallendo paraametros de la ruta
+    const desde = Number(req.query.desde) || 0;
+
+    //Ejecuta todas las promesas al mismo tiempo y usando desestructuración se obtienen los resultados inidviduales
+    const [usuarios, total] = await Promise.all([
+        Usuario.find({}, 'nombre email role google')
+        .skip(desde)
+        .limit(5),
+
+        Usuario.countDocuments()
+    ]);
+
+return resp.status(200).json({
+    ok: true,
+    usuarios,
+    total
+});
 }
 
 const crearUsuarios = async (req = request, resp = response) => {
     const { email, password } = req.body;
 
-    try{
+    try {
         const existeEmail = await Usuario.findOne({ email });
 
-        if(existeEmail){
+        if (existeEmail) {
             return resp.status(400).json({
-                ok : false,
-                msg : 'El correo ya esta registrado'
+                ok: false,
+                msg: 'El correo ya esta registrado'
             });
         }
 
-        const usuario = new Usuario( req.body );
+        const usuario = new Usuario(req.body);
 
         const salt = bcryptjs.genSaltSync(10);
         usuario.password = bcryptjs.hashSync(password, salt);
 
         await usuario.save();
         const token = await generarJWT(usuario.id);
-        
+
         return resp.status(200).json({
-            ok : true,
+            ok: true,
             usuario,
             token
         });
-    }catch(err){
+    } catch (err) {
         console.log(err);
         return resp.status(500).json({
-            ok : false,
-            msg : 'Ocurrio un error al momento de crear el usuario, revisar logs'
+            ok: false,
+            msg: 'Ocurrio un error al momento de crear el usuario, revisar logs'
         });
     }
 
@@ -56,67 +66,67 @@ const crearUsuarios = async (req = request, resp = response) => {
 const actualizaUsuario = async (req = request, resp = response) => {
     const uid = req.params.id;
 
-    try{
+    try {
         const dbUser = await Usuario.findById(uid);
 
 
-        if(!dbUser){
+        if (!dbUser) {
             return resp.status(404).json({
-                ok : false,
-                msg : 'No existe un usuario con ese ID'
+                ok: false,
+                msg: 'No existe un usuario con ese ID'
             });
         }
-        
-        const {google, password, email, ...campos} = req.body;
 
-        if(dbUser.email !== email){
+        const { google, password, email, ...campos } = req.body;
+
+        if (dbUser.email !== email) {
             const existeEmail = await Usuario.findOne({ email });
-            if(existeEmail){
+            if (existeEmail) {
                 return resp.status(400).json({
-                    ok : false,
-                    msg : 'Ya existe un usuario con ese email'
+                    ok: false,
+                    msg: 'Ya existe un usuario con ese email'
                 });
             }
         }
 
 
         campos.email = email;
-        const usuarioActualizado = await Usuario.findByIdAndUpdate(uid, campos, {new : true});
+        const usuarioActualizado = await Usuario.findByIdAndUpdate(uid, campos, { new: true });
 
         return resp.status(200).json({
-            ok : true,
-            usuario : usuarioActualizado
+            ok: true,
+            usuario: usuarioActualizado
         })
-    }catch(err){
+    } catch (err) {
         console.log(err);
         return resp.status(500).json({
-            ok : false,
-            msg : 'Ocurrio un error al momento de actualizar el usuario'
+            ok: false,
+            msg: 'Ocurrio un error al momento de actualizar el usuario'
         })
     }
 }
 
 const borrarUsuario = async (req = request, resp = response) => {
     const uid = req.params.id;
-    try{
+    try {
         const dbUser = await Usuario.findById(uid);
-        if(!dbUser){
+        if (!dbUser) {
             return resp.status(404).json({
-                ok : false,
-                msg : 'No existe un usuario con ese id'
+                ok: false,
+                msg: 'No existe un usuario con ese id'
             });
         }
 
         await Usuario.findByIdAndDelete(uid);
         return resp.status(200).json({
-            ok  : true,
-            msg : 'Usuario eliminado'
+            ok: true,
+            msg: 'Usuario eliminado'
         });
-    }catch(err){
+    } catch (err) {
         console.log(err);
         return resp.status(500).json({
-            ok : true,
-            msg : 'Ocurrio un error al momento de eliminar al usuario'
+            ok: true,
+            msg: 'Ocurrio un error al momento de eliminar al usuario'
         });
     }
 }
