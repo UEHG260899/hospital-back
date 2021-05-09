@@ -13,7 +13,7 @@ const getUsuarios = async (req = request, resp = response) => {
 
     //Ejecuta todas las promesas al mismo tiempo y usando desestructuración se obtienen los resultados inidviduales
     const [usuarios, total] = await Promise.all([
-        Usuario.find({}, 'nombre email role google')
+        Usuario.find({}, 'nombre email role google img')
         .skip(desde)
         .limit(5),
 
