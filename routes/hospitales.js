@@ -18,7 +18,8 @@ router.post('/', [
 ], crearHospitales);
 
 router.put('/:id', [
-    
+    validarJWT,
+    check('nombre', 'El nombre del hospital es necesario').notEmpty()
 ], actualizarHospital);
 
 

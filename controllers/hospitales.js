@@ -36,10 +36,48 @@ const crearHospitales = async (req = request, resp = response) => {
 }
 
 const actualizarHospital = async (req = request, resp = response) => {
-    return resp.status(200).json({
-        ok : true,
-        msg : 'actualizarHospital'
-    });
+    
+    const id = req.params.id;
+    try {
+
+        const dbHospital = await Hospital.findById(id);
+
+        if(!dbHospital){
+            return resp.status(404).json({
+                ok : false,
+                msg : 'No existe un hospital no ese id'
+            });
+        }
+
+        const cambiosHospital = {
+            ...req.body,
+            usuario: req.uid
+        }
+
+        const nombre = cambiosHospital.nombre;
+
+        if(dbHospital.nombre !== nombre){
+            const existeHosp = await Hospital.findOne({ nombre });
+            if(existeHosp){
+                return resp.status(400).json({
+                    ok : false,
+                    msg : 'Ya existe otro hospital con ese nombre'
+                });
+            }
+        }
+
+        const hospitalActual = await Hospital.findByIdAndUpdate(id, cambiosHospital, {new : true});
+        resp.status(200).json({
+            ok : true,
+            hospital : hospitalActual
+        });
+    }catch(err){
+        console.log(err);
+        resp.status(500).json({
+            ok : false,
+            msg : 'Error al actualizar el hospital'
+        })
+    }
 }
 
 const borrarHospitales = async (req = request, resp = response) => {
