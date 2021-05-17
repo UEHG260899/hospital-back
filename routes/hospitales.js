@@ -23,7 +23,7 @@ router.put('/:id', [
 ], actualizarHospital);
 
 
-router.delete('/:id', borrarHospitales);
+router.delete('/:id', validarJWT, borrarHospitales);
 
 
 module.exports = router;
