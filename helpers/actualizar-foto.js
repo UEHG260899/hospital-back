@@ -1,8 +1,8 @@
 const fs = require('fs');
 
 const Usuario = require('../models/Usuario');
-const Medico = require('../models/Medicos');
-const Hospital = require('../models/Hospital');
+const Medico = require('../models/medicos');
+const Hospital = require('../models/hospital');
 
 const borrarImagen = (path) => {
     if(fs.existsSync(path)){

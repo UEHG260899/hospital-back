@@ -1,7 +1,7 @@
 const { request, response } = require('express');
 const Usuario = require('../models/Usuario');
-const Medico = require('../models/Medicos');
-const Hospital = require('../models/Hospital');
+const Medico = require('../models/medicos');
+const Hospital = require('../models/hospital');
 
 
 const getBusquedaTotal = async (req = request, resp = response) => {

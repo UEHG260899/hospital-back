@@ -1,5 +1,5 @@
 const { request, response } = require('express');
-const Hospital = require('../models/Hospital');
+const Hospital = require('../models/hospital');
 
 const getHospitales = async (req = request, resp = response) => {
     const hospitales = await Hospital.find()
