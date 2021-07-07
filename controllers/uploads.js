@@ -78,7 +78,7 @@ const mostrarImagen = (req = request, resp = response) => {
     const pathImg = path.join( __dirname, `../uploads/${tipo}/${foto}` );
 
     //Imagen por defecto
-    if(!fs.existsSync(pathImg)){
+    if(fs.existsSync(pathImg)){
         resp.sendFile(pathImg);
     }else{
         const pathImg = path.join(__dirname, `../uploads/no-image.jpg`);
