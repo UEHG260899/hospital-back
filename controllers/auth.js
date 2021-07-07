@@ -74,7 +74,7 @@ const googleSignIn = async(req = request, resp = response) => {
         await usuario.save();
 
         //Generar JWt
-        const token = await generarJWT( dbUser.id );
+        const token = await generarJWT( usuario.id );
 
         resp.status(200).json({
             ok : true,
@@ -93,12 +93,24 @@ const googleSignIn = async(req = request, resp = response) => {
 const renewToken = async(req = request, resp = response) => {
     
     const uid = req.uid;
-    
+
     const token = await generarJWT(uid);
+
+    const dbUser = await Usuario.findById(uid);
+
+    if(!dbUser){
+        return resp.status(404).json({
+            ok : false,
+            msg : 'No se encontro un usuario valido'
+        });
+    }
+
+
     
     resp.status(200).json({
         ok: true,
-        token
+        token,
+        usuario : dbUser
     });
 }
 
