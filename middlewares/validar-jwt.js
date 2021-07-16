@@ -35,20 +35,20 @@ const validarAdminRole = async (req = request, resp = response, next) => {
     const uid = req.uid;
 
     try {
-        
+
         const usuarioDb = await Usuario.findById(uid);
 
-        if(!usuarioDb){
+        if (!usuarioDb) {
             return resp.status(404).json({
-                ok : false,
-                msg : 'El usuario no existe'
+                ok: false,
+                msg: 'El usuario no existe'
             });
         }
 
-        if(usuarioDb.role !== 'ADMIN_ROLE'){
+        if (usuarioDb.role !== 'ADMIN_ROLE') {
             return resp.status(403).json({
-                ok : false,
-                msg : 'No tiene privilegios para hcer eso'
+                ok: false,
+                msg: 'No tiene privilegios para hcer eso'
             });
         }
 
@@ -57,7 +57,42 @@ const validarAdminRole = async (req = request, resp = response, next) => {
     } catch (error) {
         console.log(error);
         resp.status(500).json({
-            ok : false,
+            ok: false,
+            msg: 'Ocurrio un error al validar si el usuarios es administrador'
+        });
+    }
+}
+
+const validarAdminRoleOMismo = async (req = request, resp = response, next) => {
+
+
+    const uid = req.uid;
+    const id = req.params.id;
+
+    try {
+
+        const usuarioDb = await Usuario.findById(uid);
+
+        if (!usuarioDb) {
+            return resp.status(404).json({
+                ok: false,
+                msg: 'El usuario no existe'
+            });
+        }
+
+        if ((usuarioDb.role === 'ADMIN_ROLE') || (uid === id)) {
+            next();
+        } else {
+            return resp.status(403).json({
+                ok: false,
+                msg: 'No tiene privilegios para hcer eso'
+            });
+        }
+
+    } catch (error) {
+        console.log(error);
+        resp.status(500).json({
+            ok: false,
             msg: 'Ocurrio un error al validar si el usuarios es administrador'
         });
     }
@@ -65,5 +100,6 @@ const validarAdminRole = async (req = request, resp = response, next) => {
 
 module.exports = {
     validarJWT,
-    validarAdminRole
+    validarAdminRole,
+    validarAdminRoleOMismo
 }
